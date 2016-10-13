@@ -10,78 +10,30 @@ type Frame struct {
 }
 
 
-// Vérife si le dernier lancer est un strike {10,0}
-func isStrike(game []Frame, key int) bool {
-
-	if game[key].firstThrow == 10 && game[key].firstThrow == 0 {
+// Vérife si le ième lancer est un strike
+func isStrike(game []Frame, i int) bool {
+	if game[i].firstThrow == 10 && game[i].secondThrow == 0 {	
 		return true
 	}
-
 	return false
 }
 
-// Vérife si le dernier lancer est un spare
-func isSpare(game []Frame, key int) bool {
-fmt.Println("titoi")
-	if isStrike(game, key){
+// Vérife si le ième lancer est un spare 
+func isSpare(game []Frame, i int) bool {
+	if isStrike(game, i){
 		return false
 	}
-
-	if game[key].firstThrow + game[key].secondThrow == 10 {
+	if (game[i].firstThrow + game[i].secondThrow) == 10 {
 		return true
 	}
-
 	return false
 }
-
-/*func nbLancerBonus(game []Frame) int {
-	nb := 0
-	if game[10].firstThrow != 0 {
-		nb = 1
-	}
-	if game[10].secondThrow != 0 {
-		nb = nb + 1
-	}
-	return nb
-}*/
 
 func GetScore(game []Frame) (int, error) {
 	score := 0
 
-	/*if len(game) != 10 {
-		// pour qu'il y ai 11 tuples, il faut que le 10ème tuple soit un spare ou un strike
-		if len(game) == 11 {
-
-			if game[9].firstThrow < 0 || game[9].secondThrow < 0 {
-				return 0, fmt.Errorf("Valeur négative dans un tuple")
-			}
-
-			// si 10ème tuple n'est ni un spare ni un strike
-			if !isSpareLastShot(game) || !isStrikeLastShot(game) {
-				return 0, fmt.Errorf("Le dernier lancé n'est pas un spare ou un strike")
-			}
-
-			// si 10ème tuple est un spare
-			if isSpareLastShot(game) {
-				if nbLancerBonus(game) != 1 {
-					return 0, fmt.Errorf("Spare en fin de partie, il y a un lancer en trop")
-				}
-			}
-			if isStrike(game) {
-				if nbLancerBonus(game) != 2 {
-					return 0, fmt.Errorf("Strike en fin de partie, il y a un lancer en trop")
-				}
-			}
-
-		} else {
-			return 0, fmt.Errorf("Pas exactement 10 tuples")
-		}
-	}*/
-
 	if len(game) < 10 {
-		fmt.Println("bingo")
-		fmt.Printf("%d\n", len(game))
-		return 0, fmt.Errorf("Pas exactement 10 tuples")
+		return 0, fmt.Errorf("Il y a moins de 10 tuples")
 	}
 
 	for i := 0; i < len(game); i++ {
@@ -96,16 +48,26 @@ func GetScore(game []Frame) (int, error) {
 		// il existe un 11ème tuple
 		if i==10 {
 			// le 10ème tuple n'est pas un spare ou un strike
-			if !isStrike(game, i-1) || !isSpare(game, i-1) {
+			if !isStrike(game, i-1) && !isSpare(game, i-1) {
+			//	fmt.Printf("BOUH")	
 				return 0, fmt.Errorf("Pas exactement 10 tuples")
 			}
-
+	
 			// le 10ème tuple est un spare
 			if isSpare(game, i-1) {
 				//TODO : peut-être mettre nil
 				if game[i].secondThrow != 0 {
 					return 0, fmt.Errorf("Spare en fin de partie, il y a un lancer en trop")
 				}
+			}
+		}
+		// Vérification présence lancers bonus
+		if i == 9 && len(game) == 10 {
+			if isSpare(game, i) {				
+				return 0, fmt.Errorf("Spare en fin de partie, il manque le lancer bonus")
+			}
+			if isStrike(game, i) {
+				return 0, fmt.Errorf("Strike en fin de partie, il manque les lancers bonus")
 			}
 		}
 
@@ -125,6 +87,7 @@ func GetScore(game []Frame) (int, error) {
 				} 
 			}
 		} else {
+			// calcul d'un tuple sans spare et sans strike
 			score = score + game[i].firstThrow + game[i].secondThrow
 		}
 
@@ -143,9 +106,9 @@ version 2:
 	Mettre 10 tuples à chaque input
 	Ne pas mettre de valeur négative
 	La somme du tuple ne doit pas dépasser 10
-
 version 3 : pas de modif des tests
-
 version bonus : 
-
+	Mettre un lancer bonus quand la partie finie par un spare
+	Mettre deux lancer bonus quand la partie finie par un strike
+	Recalculer le bon score pour les tests concernés
 */

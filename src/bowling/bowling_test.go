@@ -19,15 +19,13 @@ func scoreChecker(input []Frame, expectedScore int, expectedError error) error {
 
 // à quoi sert cette function ??
 
-/*func TestNullScore(t *testing.T) {
+func TestNullScore(t *testing.T) {
 	input := []Frame{{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}}
 	expected := 0
-	// err := scoreChecker(input, expected, nil)
-	// if err != nil
 	if err := scoreChecker(input, expected, nil); err != nil {
 		t.Fatalf("%+v\n", err)
 	}
-}*/
+}
 
 // test le score total d'une partie sans spare ni strike
 func TestScore(t *testing.T) {
@@ -47,7 +45,7 @@ func TestScore(t *testing.T) {
 func TestNbTuples(t *testing.T) {
 	input := []Frame{{7, 3},{1, 2}}
 
-	expectedError:=fmt.Errorf("Pas exactement 10 tuples")
+	expectedError:=fmt.Errorf("Il y a moins de 10 tuples")
 	expected := 0
 
 	if err := scoreChecker(input, expected, expectedError); err != nil {
@@ -90,8 +88,8 @@ func TestScoreSpare(t *testing.T) {
 		t.Fatalf("%+v\n", err)
 	}
 	// Spare au dernier tour
-	input = []Frame{{6, 2},{5, 2},{4, 5},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{8, 2}}
-	expected = 78
+	input = []Frame{{6, 2},{5, 2},{4, 5},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{8, 2}, {3,0}}
+	expected = 84
 	if err := scoreChecker(input, expected, nil); err != nil {
 		t.Fatalf("%+v\n", err)
 	}
@@ -106,47 +104,26 @@ func TestScoreStrike(t *testing.T) {
 		t.Fatalf("%+v\n", err)
 	}
 	// deux strikes à la suite
-	input = []Frame{{6, 2},{10,0},{10,0},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{8, 2}}
-	expected = 104
+	input = []Frame{{6, 2},{10,0},{10,0},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{8, 2}, {6,0}}
+	expected = 116
 	if err := scoreChecker(input, expected, nil); err != nil {
 		t.Fatalf("%+v\n", err)
 	}
 
 	// Strike au dernier tour
-	input = []Frame{{3, 2},{5, 2},{4, 5},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{10,0}}
-	expected = 75
+	input = []Frame{{3, 2},{5, 2},{4, 5},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{10,0},{2,3}}
+	expected = 85
 	if err := scoreChecker(input, expected, nil); err != nil {
 		t.Fatalf("%+v\n", err)
 	}
 
 	// deux strikes aux derniers tours
-	input = []Frame{{3, 2},{5, 2},{4, 5},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{10,0},{10,0}}
-	expected = 87
+	input = []Frame{{3, 2},{5, 2},{4, 5},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{10,0},{10,0}, {2,3}}
+	expected = 99
 	if err := scoreChecker(input, expected, nil); err != nil {
 		t.Fatalf("%+v\n", err)
 	}
 }
-
-
-// test lorsque le dernier tuple
-/*func TestLanceBonusSpare(t *testing.T) {
-	// deux strikes à la suite
-	input := []Frame{{6,2},{10,0},{10,0},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{8, 2},{5,0}}
-	expected := 104
-	if err := scoreChecker(input, expected, nil); err != nil {
-		t.Fatalf("%+v\n", err)
-	}
-}
-
-
-func TestLanceBonusStrike(t *testing.T) {
-	// deux strikes à la suite
-	input := []Frame{{6, 2},{10,0},{10,0},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{10,0},{5,2}}
-	expected := 104
-	if err := scoreChecker(input, expected, nil); err != nil {
-		t.Fatalf("%+v\n", err)
-	}
-}*/
 
 
 // Test si plus de 10 tuples et dernier lancer n'est pas un strike ou spare
@@ -165,6 +142,25 @@ func TestLanceFinStrikeSpare(t *testing.T) {
 	input = []Frame{{6, 2},{10, 0},{10, 0},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{9, 1},{5, 2}}
 
 	expectedError=fmt.Errorf("Spare en fin de partie, il y a un lancer en trop")
+	expected = 0
+
+	if err := scoreChecker(input, expected, expectedError); err != nil {
+		t.Fatalf("%+v\n", err)
+	}
+	// le 10ème tuple est un spare donc il manque un lancer bonus
+	input = []Frame{{6, 2},{10, 0},{10, 0},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{9, 1}}
+
+	expectedError=fmt.Errorf("Spare en fin de partie, il manque le lancer bonus")
+	expected = 0
+
+	if err := scoreChecker(input, expected, expectedError); err != nil {
+		t.Fatalf("%+v\n", err)
+	}
+
+	// le 10ème tuple est un strike donc il manque les lancers bonus
+	input = []Frame{{6, 2},{10, 0},{10, 0},{5, 2},{7, 0},{7, 2},{7, 1},{1, 4},{7, 1},{10, 0}}
+
+	expectedError=fmt.Errorf("Strike en fin de partie, il manque les lancers bonus")
 	expected = 0
 
 	if err := scoreChecker(input, expected, expectedError); err != nil {
