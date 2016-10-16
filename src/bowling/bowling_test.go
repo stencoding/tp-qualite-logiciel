@@ -7,7 +7,6 @@ import (
 
 func scoreChecker(input []Frame, expectedScore int, expectedError error) error {
 	score, err := GetScore(input)
-
 	if err != expectedError && !(err != nil && expectedError != nil && err.Error() == expectedError.Error()) {
 		return fmt.Errorf("Score error : %+v, expected %+v", err, expectedError)
 	}
@@ -18,7 +17,6 @@ func scoreChecker(input []Frame, expectedScore int, expectedError error) error {
 }
 
 // à quoi sert cette function ??
-
 func TestNullScore(t *testing.T) {
 	input := []Frame{{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}}
 	expected := 0
